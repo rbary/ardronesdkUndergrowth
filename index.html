@@ -44,11 +44,11 @@ Il faut entendre par "contrôler" le fait d'effectuer les actions suivantes : </
 <li>Faire du mapping 3D</li>
 </ul>
 
-<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/jumpingsumorollingspider.jpg" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/rbary/ardronesdkUndergrowth/gh-pages/images/ardronesdk/jumpingsumorollingspider.jpg" alt=""></p>
 
 <p><strong>Exemple d'utilisation du Parrot SDK</strong>: l'application FreeFlight3 qu'il est recommandé d'installer sous Android ou iOS lors de l'achat d'un drone ou minidrone, utilise l'ARDroneSDK3.</p>
 
-<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/freeflight.jpg" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/rbary/ardronesdkUndergrowth/gh-pages/images/ardronesdk/freeflight.jpg" alt=""></p>
 
 <blockquote>
 <p>Est-il possible de créer sa propre application de contrôle de drones avec ce SDK ?"</p>
@@ -208,7 +208,7 @@ $ ./studio.sh
 
 <p>Android studio vous indiquera qu'il vous manque Android SDK. Faites <code>next</code> pour l'installer.</p>
 
-<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/install_android_sdk.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/rbary/ardronesdkUndergrowth/gh-pages/images/ardronesdk/install_android_sdk.png" alt=""></p>
 
 <p>Vous pouvez choisir l'emplacement qui vous convient; Notons qu'il est préférable de l'installer à l'extérieur de android-studio
 Puis vous faites <code>finish</code>.</p>
@@ -230,13 +230,13 @@ On a donc Android SDK et Android NDK installés respectivement aux emplacements
 On renseigne les variables d'environnement nécessaires (<code>ANDROID_SDK_PATH</code> et 
 <code>ANDROID_NDK_PATH</code>) avec ces chemins dans le fichier /etc/environnement en root comme ceci:</p>
 
-<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/android_sdk_ndk_path.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/rbary/ardronesdkUndergrowth/gh-pages/images/ardronesdk/android_sdk_ndk_path.png" alt=""></p>
 
 <p>Ensuite <code>$ source /etc/environnement</code>.</p>
 
 <p>Puis on vérifie, qu'elles ont été déclarées:</p>
 
-<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/android_sdk_ndk_path_check.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/rbary/ardronesdkUndergrowth/gh-pages/images/ardronesdk/android_sdk_ndk_path_check.png" alt=""></p>
 
 <p>On peut dès lors builder notre Parrot SDK pour Android. On refait les mêmes manipulations de l'étape 1 en donnant un autre nom au répertoire qui va recevoir le SDK. <code>ARDroneSDK-Android</code> par exemple.</p>
 
@@ -283,7 +283,7 @@ $ repo sync
 <h5>
 <a id="mise-en-place-des-dépendances" class="anchor" href="#mise-en-place-des-d%C3%A9pendances" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mise en place des dépendances</h5>
 
-<p>A ce jour, les instructions décrites sur le <a href="http://developer.parrot.com/docs/bebop/?c#general-build">site des développeurs Parrot</a> pour faire fonctionner les exemples du SDK, sont sans issue, du moins pour Unix.
+<p>A ce jour, les instructions décrites sur le <a href="http://developer.parrot.com/docs/bebop/?c#general-build">site de parrot dédié au développeurs</a> pour faire fonctionner les exemples du SDK, sont sans issue, du moins pour Unix.
 Les "Makefiles" des exemples sous Unix n'étant pas à jour par rapport à l'architecture du SDK, il faudra y effectuer quelques modifications, et faire  ensuite quelques builds atomiques pour les bibliothèques manquantes.
 Focalisons nous à présent sur les manipulations à faire pour l'exemple "Jumping Sumo Piloting".</p>
 
@@ -308,7 +308,7 @@ LIBS_DBG=-L$(SDK_DIR)/out/Unix-base/staging/usr/lib -larsal_dbg -larcommands_dbg
 <p><em>Problème</em> : La bibliothèque <code>libardiscovery</code> est manquante dans le répertoire 
 <code>~/ARDroneSDK/out/Unix-base/staging/usr/lib</code> qui contient l'ensemble des bibliothèques qui ont été construites pour la plateforme Unix lors du Build complet du SDK.</p>
 
-<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/libardiscovery_miss.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/rbary/ardronesdkUndergrowth/gh-pages/images/ardronesdk/libardiscovery_miss.png" alt=""></p>
 
 <p><em>Solution</em> : Faire un build élémentaire pour cette bibliothèque.</p>
 
@@ -327,7 +327,7 @@ $ make install
 
 <p>Le résultat attendu est le suivant :</p>
 
-<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/libardiscovery_lib_include.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/rbary/ardronesdkUndergrowth/gh-pages/images/ardronesdk/libardiscovery_lib_include.png" alt=""></p>
 
 <p><code>libardiscovery</code> est bien installé dans le répertoire 
 <code>~/ARDroneSDK/out/Unix-base/staging/usr/lib</code> et les headers correspondants (qui pourront être utilisés par d'autres bibliothèques) le sont aussi dans le répertoire <code>~/ARDroneSDK/out/Unix-base/staging/usr/include</code></p>
@@ -336,7 +336,7 @@ $ make install
 
 <p>On peut remarquer que dans le Makefile, que notre exemple dépend d'une bibliothèque externe, permettant de disposer d'une interface dans un terminal texte et aussi d'utiliser la souris ainsi que les touches de fonctions du clavier : <a href="http://arnaud-feltz.developpez.com/tutoriels/ncurses/?page=introduction#LI-A"><code>libncurses</code> </a></p>
 
-<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/lncurses.png" alt="lncurses"></p>
+<p><img src="https://raw.githubusercontent.com/rbary/ardronesdkUndergrowth/gh-pages/images/ardronesdk/lncurses.png" alt="lncurses"></p>
 
 <p>On installe libncurses si nécessaire:</p>
 
@@ -358,7 +358,7 @@ $ ./JumpingSumoPiloting
 
 <p>Si après le <code>make</code> vous avez une erreur comme sur l'image qui suit :</p>
 
-<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/usrbinlink.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/rbary/ardronesdkUndergrowth/gh-pages/images/ardronesdk/usrbinlink.png" alt=""></p>
 
 <p>Il faudra créer un lien symbolique dans <code>/usr/lib</code> qui pointera vers chacune des bibliothèques nécessaires pour <em>JumpingSumoPiloting</em> comme ceci:</p>
 
@@ -439,7 +439,7 @@ $ ./JumpingSumoPiloting
 <a id="mise-en-place-et-mise-en-fonctionnement" class="anchor" href="#mise-en-place-et-mise-en-fonctionnement" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mise en place et mise en fonctionnement</h5>
 
 <p>Commençons par lancer Android Studio avec <code>$ ~/android-studio/bin/studio.sh</code> et importez notre exemple comme ceci:
-<img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/open_existing_project.png" alt=""></p>
+<img src="https://raw.githubusercontent.com/rbary/ardronesdkUndergrowth/gh-pages/images/ardronesdk/open_existing_project.png" alt=""></p>
 
 <p>Ouvrez l'explorateur projet, on voit bien que les dépendences aux librairies du SDK Parrot sont effectivement établies. Ouvrez le fichier 
 <code>build.gradle (Module: app)</code> puis dans <code>dependencies { }</code> remplacez les lignes
@@ -457,7 +457,7 @@ suivantes </p>
 <p>Dans <code>defaultConfig{ ...}</code> rajoutez la ligne <code>multiDexEnabled true</code> pour activer le support MultiDex [explication]() et mettez à jour 
 <code>build.gradle</code> avec <code>Sync now</code></p>
 
-<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/buildgradle_sync.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/rbary/ardronesdkUndergrowth/gh-pages/images/ardronesdk/buildgradle_sync.png" alt=""></p>
 
 <p>Editez le fichier <code>MainActivity.java</code> qui se trouve dans 
 <code>app &gt; src &gt; main &gt; java &gt; com &gt; parrot &gt; rollingspiderpiloting</code> en modifiant les lignes <strong>87</strong> et <strong>285</strong> par:</p>
