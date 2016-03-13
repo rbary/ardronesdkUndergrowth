@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="ARDroneSDK : Prise en main et possibilités d&#39;utilisation">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>ARDroneSDK</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/rbary/ardronesdkUndergrowth">View on GitHub</a>
+
+          <h1 id="project_title">ARDroneSDK</h1>
+          <h2 id="project_tagline">Prise en main et possibilités d&#39;utilisation</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/rbary/ardronesdkUndergrowth/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/rbary/ardronesdkUndergrowth/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>ARDroneSDK3 est à ce jour la dernière version du Parrot SDK (version 3.8), publiée en novembre 2014. Pour faire simple, ce SDK permet de contrôler la plupart des drones et/ou minidrones de Parrot (Rolling Spider, Bebop Drone, Skycontroller, Jumping Sumo).
+Il faut entendre par "contrôler" le fait d'effectuer les actions suivantes : </p>
+
+<ul>
+<li>Se connecter à un drone</li>
+<li>Piloter un drone</li>
+<li>Recevoir du stream depuis un drone</li>
+<li>Sauvegarder et télécharger des photos ou des vidéos réalisées par un drone</li>
+<li>Transmettre et faire jouer des séquences automatiques de vol (autopilot flight plan)</li>
+<li>Mettre à jour le drone</li>
+<li>Faire du mapping 3D</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/jumpingsumorollingspider.jpg" alt=""></p>
+
+<p><strong>Exemple d'utilisation du Parrot SDK</strong>: l'application FreeFlight3 qu'il est recommandé d'installer sous Android ou iOS lors de l'achat d'un drone ou minidrone, utilise l'ARDroneSDK3.</p>
+
+<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/freeflight.jpg" alt=""></p>
+
+<blockquote>
+<p>Est-il possible de créer sa propre application de contrôle de drones avec ce SDK ?"</p>
+</blockquote>
+
+<p>Oui, tout à fait, c'est tout l'intérêt de la mise à disposition des sources du SDK. Si vous avez des compétences en développement d'applications mobiles (Android ou iOS), il vous suffira de créer un projet de développement mobile (Android Studio, Plugin Eclipse ADT, XCode), ensuite de mettre en place les dépendances nécessaires pour avoir la main sur les bibliothèques du SDK et enfin les utiliser à votre escient dans le code de votre application mobile.
+Il est aussi possible d'implémenter une application de type client lourd en C permettant de contrôler le drone depuis un laptop (ici sous xubuntu 14.04) </p>
+
+<p>En effet, les sources du SDK sont hébergés dans un répertoire Github sous licence BSD. Ce répertoire contient principalement : </p>
+
+<ul>
+<li>Les sources des différentes bibliothèques qui constituent le SDK</li>
+<li>Des utilitaires de Build</li>
+<li>Un manifest</li>
+<li>Quelques exemples d'utilisation du SDK pour chaque plateforme (Unix, Android, iOS)</li>
+</ul>
+
+<p>On peut retrouver l'organisation complète du SDK par <a href="http://developer.parrot.com/docs/bebop/?c#organisation">ici</a></p>
+
+<h2>
+<a id="comment-utiliser-le-sdk-" class="anchor" href="#comment-utiliser-le-sdk-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Comment utiliser le SDK ?</h2>
+
+<p>Le SDK est principalement écrit en C, et fourni donc des bibliothèques pour les Systèmes Unix, Android et iOS respectivement utilisables en C, Java et Objective C.</p>
+
+<p><strong>NB</strong>: Les manipulations pour ce billet concernent les plateformes Unix et Android.</p>
+
+<h3>
+<a id="outils-pré-requis" class="anchor" href="#outils-pr%C3%A9-requis" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Outils pré-requis</h3>
+
+<p>Il faut commencer par installer au préalable les outils suivants:</p>
+
+<ul>
+<li><a href="#curl">curl</a></li>
+<li><a href="#repo">repo</a></li>
+<li><a href="#git">git</a></li>
+<li><a href="#automake">automake</a></li>
+<li><a href="#libtool">libtool</a></li>
+<li><a href="#yasm">yasm</a></li>
+<li><a href="#nasm">nasm</a></li>
+</ul>
+
+<p><a name="curl"></a></p>
+
+<h4>
+<a id="installer-curl" class="anchor" href="#installer-curl" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installer curl</h4>
+
+<p>Dans un terminal, Faire <code>$ sudo apt-get install curl</code></p>
+
+<p><a name="repo"></a></p>
+
+<h4>
+<a id="installer-repo-tool" class="anchor" href="#installer-repo-tool" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installer Repo tool</h4>
+
+<pre><code>$ mkdir ~/bin
+$ PATH=~/bin:$PATH
+$ curl https://storage.googleapis.com/git-repo-downloads/repo &gt; ~/bin/repo
+$ chmod a+x ~/bin/repo
+</code></pre>
+
+<h4>
+<a id="installer-git" class="anchor" href="#installer-git" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installer git</h4>
+
+<p><a name="git"></a>
+Faire <code>$ sudo apt-get insall git-core</code>
+Ensuite effectuer la config minimale</p>
+
+<pre><code>$ git config --global user.name "Your Name"
+$ git config --global user.email "jhon@doe.com"
+</code></pre>
+
+<p><a name="automake"></a></p>
+
+<h4>
+<a id="installer-automake" class="anchor" href="#installer-automake" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installer automake</h4>
+
+<p>Automake étant inclu dans autoconf, on installe simplement autoconf</p>
+
+<p><code>$ sudo apt-get install autoconf</code></p>
+
+<p><a name="libtool"></a></p>
+
+<h4>
+<a id="installer-libtool" class="anchor" href="#installer-libtool" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installer libtool</h4>
+
+<p><code>$ sudo apt-get install libtool</code></p>
+
+<p><a name="yasm"></a></p>
+
+<h4>
+<a id="installer-yasm" class="anchor" href="#installer-yasm" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installer yasm</h4>
+
+<p><code>$ sudo apt-get install yasm</code></p>
+
+<p><a name="nasm"></a></p>
+
+<h4>
+<a id="installer-nasm" class="anchor" href="#installer-nasm" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installer nasm</h4>
+
+<p><code>$ sudo apt-get install nasm</code></p>
+
+<h3>
+<a id="Étape-1-récupération-des-sources-avec-repo" class="anchor" href="#%C3%89tape-1-r%C3%A9cup%C3%A9ration-des-sources-avec-repo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Étape 1: Récupération des sources avec Repo</h3>
+
+<p>1.Créer un dossier vide dans lequel on va mettre en place notre SDK</p>
+
+<pre><code>$ mkdir ~/ARDroneSDK
+$ cd ~/ARDroneSDK
+</code></pre>
+
+<p>2.Lancer la commande <code>repo init</code> pour initialiser un repo avec le manifest du SDK</p>
+
+<p><code>$ repo init -u https://github.com/Parrot-Developers/arsdk_manifests.git</code></p>
+
+<p>3.Descendre l'arbre complet des sources distants du SDK</p>
+
+<p><code>$ repo sync</code></p>
+
+<h3>
+<a id="Étape-2-le-build" class="anchor" href="#%C3%89tape-2-le-build" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Étape 2: Le Build</h3>
+
+<h4>
+<a id="pour-une-plateforme-unix" class="anchor" href="#pour-une-plateforme-unix" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Pour une plateforme Unix</h4>
+
+<p>Les manipulation pour un build sous Unix sont les suivantes :</p>
+
+<pre><code>$ cd ~/ARDroneSDK
+$ ./build.sh -p Unix-forall -t build-sdk-j
+</code></pre>
+
+<p>On aura en sortie du build le répertoire <code>~/ARDroneSDK/out/Unix-base/usr</code>.
+On peut à présent faire fonctionner les exemples sous Unix fournis avec le SDK qu'on peut trouver dans le répertoire <code>~/ARDroneSDK/packages/Samples/Unix</code>.</p>
+
+<h4>
+<a id="pour-une-plateforme-android" class="anchor" href="#pour-une-plateforme-android" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Pour une plateforme Android</h4>
+
+<p>Pour un build Android (IDE Android sur Unix) il faut :</p>
+
+<ul>
+<li>un JDK avec Java 6(1.6) minimum</li>
+<li>
+<a href="http://developer.android.com/sdk/installing/index.html">Android SDK</a> et <a href="http://developer.android.com/ndk/index.html">Android NDK</a>
+</li>
+<li>Déclarer les variables d'environnement <code>ANDROID_SDK_PATH</code> et 
+<code>ANDROID_NDK_PATH</code> pour pointer sur les répertoires correspondants aux outils respectifs.</li>
+</ul>
+
+<p>Nous utiliserons <a href="http://developer.android.com/sdk/index.html#top">Android Studio</a>) pour notre exemple. C'est un bundle avec lequel on peut avoir de base une installation de Android SDK.</p>
+
+<h5>
+<a id="installer-android-studio-et-android-sdk" class="anchor" href="#installer-android-studio-et-android-sdk" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installer Android Studio et Android SDK</h5>
+
+<p>Télécharger <a href="http://developer.android.com/sdk/index.html#Other">Android Studio</a> à la racine de votre répertoire personnel. Dézippez <code>android-studio-ide-141.2456560-linux.zip</code> puis dans un terminal, faites :</p>
+
+<pre><code>$ cd ~/android-studio/bin/
+$ ./studio.sh
+</code></pre>
+
+<p>Android studio vous indiquera qu'il vous manque Android SDK. Faites <code>next</code> pour l'installer.</p>
+
+<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/install_android_sdk.png" alt=""></p>
+
+<p>Vous pouvez choisir l'emplacement qui vous convient; Notons qu'il est préférable de l'installer à l'extérieur de android-studio
+Puis vous faites <code>finish</code>.</p>
+
+<h5>
+<a id="installer-android-ndk" class="anchor" href="#installer-android-ndk" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installer Android NDK</h5>
+
+<p>Android NDK est un ensemble d'outils permettant d'implémenter une partie d'une application avec du code natif C ou C++. Nous installerons Android NDK à la racine de notre répertoire personnel.</p>
+
+<p>Commencez par télécharger le paquet correspondant depuis ce <a href="http://developer.android.com/ndk/downloads/index.html">lien</a> et suivez les instructions d'installation</p>
+
+<h5>
+<a id="déclarer-les-variables-denvironnement" class="anchor" href="#d%C3%A9clarer-les-variables-denvironnement" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Déclarer les variables d'environnement</h5>
+
+<p>Android studio sera prêt à être utilisé, mais vous pouvez fermer la fenêtre.
+On a donc Android SDK et Android NDK installés respectivement aux emplacements 
+<code>/home/rbary/Android/SDK</code> et 
+<code>/home/rbary/android-ndk-r10e</code>.
+On renseigne les variables d'environnement nécessaires (<code>ANDROID_SDK_PATH</code> et 
+<code>ANDROID_NDK_PATH</code>) avec ces chemins dans le fichier /etc/environnement en root comme ceci:</p>
+
+<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/android_sdk_ndk_path.png" alt=""></p>
+
+<p>Ensuite <code>$ source /etc/environnement</code>.</p>
+
+<p>Puis on vérifie, qu'elles ont été déclarées:</p>
+
+<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/android_sdk_ndk_path_check.png" alt=""></p>
+
+<p>On peut dès lors builder notre Parrot SDK pour Android. On refait les mêmes manipulations de l'étape 1 en donnant un autre nom au répertoire qui va recevoir le SDK. <code>ARDroneSDK-Android</code> par exemple.</p>
+
+<pre><code>$ mkdir ~/ARDroneSDK-Android
+$ cd ~/ARDroneSDK-Android
+$ repo init -u https://github.com/Parrot-Developers/arsdk_manifests.git
+$ repo sync
+</code></pre>
+
+<p>Pour préparer la mise en marche de notre example d'utilisation du SDK sous Android nous allons en plus du build des bibliothèques du SDK, construire les dépendances également pour les examples (Build JNI, Exécution Gradlew assembledebug pour Android Studio). Donc, à la racine de <code>~ARDroneSDK-Android</code> nous ferons </p>
+
+<pre><code>$ ./build.sh -p Android-forall -t build-sample -j
+</code></pre>
+
+<p>Au lieu de faire </p>
+
+<pre><code>$ ./build.sh -p Android-forall -t build-sdk -j
+</code></pre>
+
+<p>Vous pouvez aller vous prendre un café car le build pour Android prend une bonne dizaine de minutes ...</p>
+
+<p>Ce build nous donnera en sortie plusieurs répertoires 
+<code>~/ARDroneSDK-Android/out/Android-[VARIANTE]/staging/usr</code></p>
+
+<p>Les valeurs possibles pour [VARIANTE] étant:</p>
+
+<ul>
+<li>armeabi</li>
+<li>armeabi_v7a</li>
+<li>mips</li>
+<li>x86</li>
+</ul>
+
+<h3>
+<a id="Étape-3-utilisation-du-sdk" class="anchor" href="#%C3%89tape-3-utilisation-du-sdk" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Étape 3: Utilisation du SDK</h3>
+
+<h4>
+<a id="exemple-dutilisation-sous-unix--jumpingsumopiloting" class="anchor" href="#exemple-dutilisation-sous-unix--jumpingsumopiloting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Exemple d'utilisation sous Unix : <em>JumpingSumoPiloting</em>
+</h4>
+
+<p>Nous nous contenterons ici, pour le moment, de faire fonctionner l'un des exemples d'utilisation livré avec le SDK, en l’occurrence 
+<em>JumpingSumoPiloting</em>.</p>
+
+<h5>
+<a id="mise-en-place-des-dépendances" class="anchor" href="#mise-en-place-des-d%C3%A9pendances" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mise en place des dépendances</h5>
+
+<p>A ce jour, les instructions décrites sur le <a href="http://developer.parrot.com/docs/bebop/?c#general-build">site des développeurs Parrot</a> pour faire fonctionner les exemples du SDK, sont sans issue, du moins pour Unix.
+Les "Makefiles" des exemples sous Unix n'étant pas à jour par rapport à l'architecture du SDK, il faudra y effectuer quelques modifications, et faire  ensuite quelques builds atomiques pour les bibliothèques manquantes.
+Focalisons nous à présent sur les manipulations à faire pour l'exemple "Jumping Sumo Piloting".</p>
+
+<p>Avec votre éditeur de texte favoris, ouvrez le Makefile situé à cet emplacement
+<code>~/ARDroneSDK/packages/Samples/Unix/JumpingSumoPiloting</code>, puis faites les modifications suivantes:</p>
+
+<pre><code>SDK_DIR=~/ARDroneSDK
+
+CFLAGS=-I$(IDIR) -I $(SDK_DIR)/out/Unix-base/staging/usr/include
+
+LIBS=-L$(SDK_DIR)/out/Unix-base/staging/usr/lib -larsal -larcommands -larnetwork
+ -larnetworkal -lardiscovery $(EXTERNAL_LIB)
+
+LIBS_DBG=-L$(SDK_DIR)/out/Unix-base/staging/usr/lib -larsal_dbg -larcommands_dbg
+ -larnetwork_dbg -larnetworkal_dbg -lardiscovery_dbg $(EXTERNAL_LIB)
+</code></pre>
+
+<p>Vous remarquerez dans les lignes précédentes du Makefile que, 
+<em>JumpingSumoPiloting</em> aura besoin des bibliothèques <code>libarsal</code>,<code>libarcommands</code>,
+<code>libarnetwork</code>,<code>libarnetworkal</code> et <code>libardiscovery</code> pour fonctionner.</p>
+
+<p><em>Problème</em> : La bibliothèque <code>libardiscovery</code> est manquante dans le répertoire 
+<code>~/ARDroneSDK/out/Unix-base/staging/usr/lib</code> qui contient l'ensemble des bibliothèques qui ont été construites pour la plateforme Unix lors du Build complet du SDK.</p>
+
+<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/libardiscovery_miss.png" alt=""></p>
+
+<p><em>Solution</em> : Faire un build élémentaire pour cette bibliothèque.</p>
+
+<p>Placez vous dans le répertoire <code>~/ARDroneSDK/package/libARDiscovery</code> qui contient les sources de notre bibliothèque manquante puis vous faites :</p>
+
+<pre><code>$ cd Build
+$ ./bootstrap
+$ ./configure --prefix=/home/rbary/ARDroneSDK/out/Unix-base/staging/usr 
+--with-libARSALInclude=~/ARDroneSDK/out/Unix-base/staging/usr/include
+$ make
+$ make install
+</code></pre>
+
+<p>Il faut renseigner pour l'argument <code>--prefix</code> l'emplacement où l'on souhaite installer la bibliothèque. Attention il faut donner un chemin absolu comme nous l'avons fait. On peut voir que notre bibliothèque dépend des includes (headers) de <code>libARSAL</code> situés à cet emplacement 
+<code>~/ARDroneSDK/out/Unix-base/staging/usr/include</code></p>
+
+<p>Le résultat attendu est le suivant :</p>
+
+<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/libardiscovery_lib_include.png" alt=""></p>
+
+<p><code>libardiscovery</code> est bien installé dans le répertoire 
+<code>~/ARDroneSDK/out/Unix-base/staging/usr/lib</code> et les headers correspondants (qui pourront être utilisés par d'autres bibliothèques) le sont aussi dans le répertoire <code>~/ARDroneSDK/out/Unix-base/staging/usr/include</code></p>
+
+<p>Remarque : Le répertoire <code>~/ARDroneSDK/package/</code> en plus de contenir des exemples de fonctionnement du SDK, comprend également les sources de toutes les bibliothèques du SDK. S'il vous manque, une bibliothèque pour un exemple donné il vous suffira de refaire la manipulation précédente pour la bibliothèque concernée.</p>
+
+<p>On peut remarquer que dans le Makefile, que notre exemple dépend d'une bibliothèque externe, permettant de disposer d'une interface dans un terminal texte et aussi d'utiliser la souris ainsi que les touches de fonctions du clavier : <a href="http://arnaud-feltz.developpez.com/tutoriels/ncurses/?page=introduction#LI-A"><code>libncurses</code> </a></p>
+
+<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/lncurses.png" alt="lncurses"></p>
+
+<p>On installe libncurses si nécessaire:</p>
+
+<pre><code>$ sudo apt-get update
+$ sudo apt-get install ncurses-dev
+</code></pre>
+
+<h5>
+<a id="mise-en-marche" class="anchor" href="#mise-en-marche" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mise en marche</h5>
+
+<p>Notre SDK étant installé correctement, les problèmes de dépendances ayant été résolus, on peut à présent faire tourner notre example <em>JumpingSumoPiloting</em>.</p>
+
+<p>On compile les sources de <em>JumpingSumoPiloting</em> et on lance notre exécutable :</p>
+
+<pre><code>$ cd ~/ARDroneSDK/package/Samples/Unix/JumpingSumoPiloting
+$ make
+$ ./JumpingSumoPiloting
+</code></pre>
+
+<p>Si après le <code>make</code> vous avez une erreur comme sur l'image qui suit :</p>
+
+<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/usrbinlink.png" alt=""></p>
+
+<p>Il faudra créer un lien symbolique dans <code>/usr/lib</code> qui pointera vers chacune des bibliothèques nécessaires pour <em>JumpingSumoPiloting</em> comme ceci:</p>
+
+<pre><code>sudo ln -s ~/ARDroneSDK/out/Unix-base/staging/usr/lib/[nom_de_lib].so 
+/usr/lib/[nom_de_lib].so
+</code></pre>
+
+<p>On a pour <code>libarsal</code> la commande suivante:</p>
+
+<pre><code>sudo ln -s ~/ARDroneSDK/out/Unix-base/staging/usr/lib/libarsal.so 
+/usr/lib/libarsal.so
+</code></pre>
+
+<p>Exceptionellement, pour <code>libardiscovery</code> la commande sera:</p>
+
+<pre><code>sudo ln -s ~/ARDroneSDK/out/Unix-base/staging/usr/lib/libardiscovery-3.1.0.so 
+/usr/lib/libardiscovery-3.1.0.so
+</code></pre>
+
+<blockquote>
+<p>Que fait JumpingSumoPiloting ?</p>
+</blockquote>
+
+<p><em>JumpingSumoPiloting</em> est un exemple simple d'utilisation du Parrot SDK qui permet de réaliser les actions suivantes:</p>
+
+<ul>
+<li>rechercher un mini drone aux alentours (notre Jumping Sumo)</li>
+<li>se connecter au minidrone (ici en wifi)</li>
+<li>envoyer et recevoir des commandes pour piloter le minidrone (Le pilotage du drone se fait avec les touches du clavier : touches directionnelles et Espace)</li>
+<li>afficher l'état de la batterie du minidrone dans une IHM</li>
+</ul>
+
+<p>Le tableau qui suit fait un récapitulatif des services fournis par les différentes bibliothèques du SDK qui sont utilisées par <em>JumpingSumoPiloting</em></p>
+
+<table>
+<thead>
+<tr>
+<th>bibliothèques</th>
+<th>Services</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>libARSAL</td>
+<td>Une couche d'abstraction du système</td>
+</tr>
+<tr>
+<td>libARCommands</td>
+<td>Les commandes qu'on peut envoyer et recevoir au/du drone</td>
+</tr>
+<tr>
+<td>libARNetwork</td>
+<td>L'envoi et la réception des paquets au/depuis le drone</td>
+</tr>
+<tr>
+<td>libARNetworkal</td>
+<td>Un couche d'abstraction pour les différents types de réseau sans-fil (Bluetooth Low Energy ou Wifi)</td>
+</tr>
+<tr>
+<td>libARDiscovery</td>
+<td>La découverte dans le réseau des drones supportés</td>
+</tr>
+</tbody>
+</table>
+
+<p><a href="http://developer.parrot.com/docs/bebop/#organisation">Pour en savoir plus sur les autres bibliothèques </a></p>
+
+<p><a href="http://www.parrot.com/fr/produits/jumping-sumo/">Pour connaître les caractéristiques techniques du Jumping Sumo</a></p>
+
+<h4>
+<a id="exemple-dutilisation-sous-android--rollingspiderpiloting" class="anchor" href="#exemple-dutilisation-sous-android--rollingspiderpiloting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Exemple d'utilisation sous Android : <em>RollingSpiderPiloting</em>
+</h4>
+
+<p>Par analogie à l'exemple sous Unix, nous nous focaliserons sur 
+<em>RollingSpiderPiloting</em>. C'est un exemple également basique d'utilisation du Parrot SDK dans un projet de développement d'application Android. </p>
+
+<h5>
+<a id="mise-en-place-et-mise-en-fonctionnement" class="anchor" href="#mise-en-place-et-mise-en-fonctionnement" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mise en place et mise en fonctionnement</h5>
+
+<p>Commençons par lancer Android Studio avec <code>$ ~/android-studio/bin/studio.sh</code> et importez notre exemple comme ceci:
+<img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/open_existing_project.png" alt=""></p>
+
+<p>Ouvrez l'explorateur projet, on voit bien que les dépendences aux librairies du SDK Parrot sont effectivement établies. Ouvrez le fichier 
+<code>build.gradle (Module: app)</code> puis dans <code>dependencies { }</code> remplacez les lignes
+suivantes </p>
+
+<pre><code>    compile project(':libARCommands')
+    compile project(':libARDiscovery')
+    compile project(':libARNetwork')
+    compile project(':libARNetworkAL')
+    compile project(':libARSAL')
+</code></pre>
+
+<p>par <code>compile 'com.parrot:arsdk:3.8.3'</code></p>
+
+<p>Dans <code>defaultConfig{ ...}</code> rajoutez la ligne <code>multiDexEnabled true</code> pour activer le support MultiDex [explication]() et mettez à jour 
+<code>build.gradle</code> avec <code>Sync now</code></p>
+
+<p><img src="https://raw.githubusercontent.com/rbary/ParrotSDK_Undergrowth/gh-pages/images/parrot/buildgradle_sync.png" alt=""></p>
+
+<p>Editez le fichier <code>MainActivity.java</code> qui se trouve dans 
+<code>app &gt; src &gt; main &gt; java &gt; com &gt; parrot &gt; rollingspiderpiloting</code> en modifiant les lignes <strong>87</strong> et <strong>285</strong> par:</p>
+
+<pre><code>ArrayAdapter&lt;String&gt; adapter = new ArrayAdapter&lt;String&gt;(MainActivity.this, android.R.layout.simple_list_item_1, android.R.id.text1, deviceNameList);
+</code></pre>
+
+<p>Ensuite vous faites <code>Build &gt; Clean Project</code>.</p>
+
+<p>On peut à présent faire <code>Run</code> et choisir son appareil de déploiement (Tablette/Smartphone Android ou Appareil Virtuel de l'emulateur).</p>
+
+<h4>
+<a id="focus-sur-rspilotingmin-et-myjspilotingmin" class="anchor" href="#focus-sur-rspilotingmin-et-myjspilotingmin" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Focus sur <strong>RSPilotingMin</strong> et <strong>MyJSPilotingMin</strong>:</h4>
+
+<p>MyRSPiloting et MyJSPiloting sont deux implémentations basiques (sans IHM) que nous réalisons pour nous focaliser sur les commandes, essentielles pour contrôler nos minidrones.</p>
+
+<h5>
+<a id="rspilotingmin" class="anchor" href="#rspilotingmin" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><strong>RSPilotingMin</strong>
+</h5>
+
+<p>En cours d'implémentation pour des aspects de connectivité <em>Bluethooh</em></p>
+
+<h5>
+<a id="jspilotingmin" class="anchor" href="#jspilotingmin" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><strong>JSPilotingMin</strong>
+</h5>
+
+<p>Dans cette implémentation, nous nous sommes donc focalisés sur un ensemble minimaliste de commandes, nécessaires pour le contrôle d'un appareil de type 
+<strong>Jumping Sumo</strong>, permettant ainsi de réaliser les taĉhes suivantes :</p>
+
+<ul>
+<li>Créer un <code>Discovery Device</code>
+</li>
+<li>Initialiser le <code>Discovery Device</code> avec un <code>Wifi Device</code>
+</li>
+<li>Créer un <code>Device Controller</code> avec le <code>Discovery Device</code>
+</li>
+<li>Supprimer le <code>Discovery Device</code>
+</li>
+<li>Ajouter une fonction de callback à au <code>Device Controller</code>  (on peut le voir comme un listener sur le deviceController) permettant notifier les changements d'état du <code>Device Controller</code> (les états possibles ici étant "en marche", "en arrêt") </li>
+<li>Ajouter au <code>Device Controller</code> une fonction de callback permettant une notification quand on reçoit une commande venant de l'appareil.</li>
+<li>Démarrer le <code>Device Controller</code>, impliquant une connection wifi entre le drone et notre système Unix.</li>
+<li>Récupérer l'état courant du <code>Device Controller</code>
+</li>
+<li>Arrêter de <code>Device Controller</code>, impliquant une déconnection wifi entre le drone et notre système Unix.</li>
+<li>Envoyer les commandes de pilotage suivantes à l'appareil, avec le 
+<code>Device Controller</code>:
+
+<ul>
+<li>Sauter</li>
+<li>Avancer</li>
+<li>Reculer</li>
+<li>Tourner à droite</li>
+<li>Tourner à gauche</li>
+</ul>
+</li>
+</ul>
+
+<p>Le tableau suivant récapitule les commandes en C du SDK qui permettent de réaliser les services énumérées en amont et les librairies concernées.</p>
+
+<table>
+<thead>
+<tr>
+<th>Services</th>
+<th>Librairie du SDK Concernée</th>
+<th>Commande associée en C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Créer un Discovery Device</td>
+<td>libARDiscovery</td>
+<td><code>ARDISCOVERY_Device_t *ARDISCOVERY_Device_New (eARDISCOVERY_ERROR *error);</code></td>
+</tr>
+<tr>
+<td>Initaliser un Discovery Device avec un Wifi Device</td>
+<td>libARDiscovery</td>
+<td><code>eARDISCOVERY_ERROR ARDISCOVERY_Device_InitWifi (ARDISCOVERY_Device_t *device, eARDISCOVERY_PRODUCT product, const char *name,const char *address,int port);</code></td>
+</tr>
+<tr>
+<td>Créer un Device Controller</td>
+<td>libARController</td>
+<td><code>ARCONTROLLER_Device_t *ARCONTROLLER_Device_New (ARDISCOVERY_Device_t *discoveryDevice, eARCONTROLLER_ERROR *error);</code></td>
+</tr>
+<tr>
+<td>Supprimer un Discovery Device</td>
+<td>libARDiscovery</td>
+<td><code>void ARDISCOVERY_Device_Delete (ARDISCOVERY_Device_t **device);</code></td>
+</tr>
+<tr>
+<td>Ajouter une fonction de callback à un Device Controller permettant de notifier les changements d'état du Device Controller</td>
+<td>libARController</td>
+<td><code>eARCONTROLLER_ERROR ARCONTROLLER_Device_AddCommandReceivedCallback (ARCONTROLLER_Device_t *deviceController, ARCONTROLLER_DICTIONARY_CALLBACK_t commandReceivedCallback, void *customData);</code></td>
+</tr>
+<tr>
+<td>Ajouter une fonction de callback à un Device Controller permettant une notification quand on reçoit une commande venant d'un appareil</td>
+<td>libARController</td>
+<td><code>eARCONTROLLER_ERROR ARCONTROLLER_Device_AddStateChangedCallback (ARCONTROLLER_Device_t *deviceController, ARCONTROLLER_Device_StateChangedCallback_t stateChangedCallback, void *customData);</code></td>
+</tr>
+<tr>
+<td>Démarrer un Device Controller</td>
+<td>libARController</td>
+<td><code>eARCONTROLLER_ERROR ARCONTROLLER_Device_Start (ARCONTROLLER_Device_t *deviceController);</code></td>
+</tr>
+<tr>
+<td>Arrêter un Device Controller</td>
+<td>libARController</td>
+<td><code>eARCONTROLLER_ERROR ARCONTROLLER_Device_Start (ARCONTROLLER_Device_t *deviceController);</code></td>
+</tr>
+<tr>
+<td>Récupérer l'état d'un Device Controller</td>
+<td>libARController</td>
+<td><code>eARCONTROLLER_DEVICE_STATE ARCONTROLLER_Device_GetState (ARCONTROLLER_Device_t *deviceController, eARCONTROLLER_ERROR *error);</code></td>
+</tr>
+<tr>
+<td>Envoyer une commande pour faire <em>Sauter</em> l'appareil</td>
+<td>libARController</td>
+<td><code>deviceController-&gt;jumpingSumo-&gt;sendAnimationsJump(deviceController-&gt;jumpingSumo,ARCOMMANDS_JUMPINGSUMO_ANIMATIONS_JUMP_TYPE_HIGH);</code></td>
+</tr>
+<tr>
+<td>Envoyer une commande pour faire <em>Avancer</em> l'appareil</td>
+<td>libARController</td>
+<td><code>deviceController-&gt;jumpingSumo-&gt;setPilotingPCMDFlag(deviceController-&gt;jumpingSumo, 1);deviceController-&gt;jumpingSumo-&gt;setPilotingPCMDSpeed (deviceController-&gt;jumpingSumo, 50);</code></td>
+</tr>
+<tr>
+<td>Envoyer une commande pour faire <em>Reculer</em> l'appareil</td>
+<td>libARController</td>
+<td><code>deviceController-&gt;jumpingSumo-&gt;setPilotingPCMDFlag (deviceController-&gt;jumpingSumo, 1);deviceController-&gt;jumpingSumo-&gt;setPilotingPCMDSpeed (deviceController-&gt;jumpingSumo, -50);</code></td>
+</tr>
+<tr>
+<td>Envoyer une commande pour faire <em>Tourner à droite</em> l'appareil</td>
+<td>libARController</td>
+<td><code>deviceController-&gt;jumpingSumo-&gt;setPilotingPCMDFlag (deviceController-&gt;jumpingSumo, 1);deviceController-&gt;jumpingSumo-&gt;setPilotingPCMDTurn (deviceController-&gt;jumpingSumo, 50);</code></td>
+</tr>
+<tr>
+<td>Envoyer une commande pour faire <em>Tourner à gauche</em> l'appareil</td>
+<td>libARController</td>
+<td><code>deviceController-&gt;jumpingSumo-&gt;setPilotingPCMDFlag (deviceController-&gt;jumpingSumo, 1);deviceController-&gt;jumpingSumo-&gt;setPilotingPCMDTurn (deviceController-&gt;jumpingSumo, -50);</code></td>
+</tr>
+</tbody>
+</table>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">ARDroneSDK maintained by <a href="https://github.com/rbary">rbary</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
